@@ -20,18 +20,21 @@ const getState = ({ getStore, getActions, setStore }) => {
 			exampleFunction: () => {
 				getActions().changeColor(0, "green");
 			},
-
 			getMessage: async () => {
-				try{
-					// fetching data from the backend
-					const resp = await fetch(process.env.BACKEND_URL + "/api/hello")
-					const data = await resp.json()
+				const myToken = localStorage.getItem('jwt-token')
+
+				fetch(process.env.BACKEND_URL + "/api/private", {
+					method: 'GET',
+					headers: {
+						'Authorization': 'Bearer ' + myToken,
+						"Content-Type": "application/json"
+					}
+				}).then((res) => res.json())
+				.then((data) => {
 					setStore({ message: data.message })
-					// don't forget to return something, that is how the async resolves
-					return data;
-				}catch(error){
+				}).catch((error) => {
 					console.log("Error loading message from backend", error)
-				}
+				})
 			},
 			changeColor: (index, color) => {
 				//get the store
